@@ -24,6 +24,21 @@ def test_gpt2(model_size='gpt2'):
   outputs['last_hidden_state'] = outputs['last_hidden_state'] * att_mask
   openai_outputs *= att_mask
 
+  # DEBUGGING:
+  openai_embed = openai_model.wte(sent_ids) + openai_model.wpe(torch.arange(sent_ids.shape[1]).unsqueeze(0))
+  our_embed = gpt.word_embedding(sent_ids) + gpt.pos_embedding(gpt.position_ids[:, :sent_ids.shape[1]])
+
+  print("Embedding Difference:", torch.abs(openai_embed - our_embed).sum().item())
+
+
+  # DEBUGGING: Compare each layer's hidden state output
+  for i, (our_layer, openai_layer) in enumerate(zip(outputs['last_hidden_state'], openai_outputs)):
+      diff = torch.abs(our_layer - openai_layer).sum().item()
+      print(f"Layer {i}: Total Difference = {diff}")
+
+  # DEBUGGING: If differences are significant, check further
+  print("Max absolute difference:", torch.max(torch.abs(outputs['last_hidden_state'] - openai_outputs)).item())
+
   assert torch.allclose(outputs['last_hidden_state'], openai_outputs, atol=1e-1, rtol=1e-2)
 
   print("Your GPT2 implementation is correct!")
