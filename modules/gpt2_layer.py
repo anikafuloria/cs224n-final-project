@@ -30,9 +30,7 @@ class GPT2Layer(nn.Module):
         IN THIS FUNCTION.
     """
     ### YOUR CODE HERE
-    output = dense_layer(output)
-    output = dropout(output)
-    return input + output
+    return input + dropout(dense_layer(output))
 
 
   def forward(self, hidden_states, attention_mask):
@@ -52,6 +50,10 @@ class GPT2Layer(nn.Module):
     ff_input = self.out_layer_norm(attn_output)
     ff_output = self.interm_af(self.interm_dense(ff_input))
     ff_output = self.add(attn_output, ff_output, self.out_dense, self.out_dropout)
+
+    # DEBUGGING
+    print("Input to LayerNorm:", hidden_states[0, 0, :5])
+    print("After LayerNorm:", attn_input[0, 0, :5])
     
     return ff_output
 

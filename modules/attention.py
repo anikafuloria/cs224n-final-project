@@ -34,20 +34,28 @@ class CausalSelfAttention(nn.Module):
   def attention(self, key, query, value, attention_mask):
     ### YOUR CODE HERE
     d_k = query.shape[-1]
-    scores = torch.matmul(query, key.transpose(-2, -1)) / torch.sqrt(torch.tensor(d_k, dtype=torch.float32))
     
-    # Apply the attention mask (causal mask)
-    scores = scores.masked_fill(attention_mask == 0, float('-inf'))
+    # Compute attention scores
+    scores = torch.matmul(query, key.transpose(-2, -1))
+    scores = scores / torch.sqrt(torch.tensor(d_k, dtype=scores.dtype, device=scores.device))
     
-    # Softmax to get attention probabilities
+    # Apply causal mask
+    scores = scores.masked_fill(attention_mask == 0, -1e9)
+    
+    # Compute attention probabilities
     attn_probs = torch.nn.functional.softmax(scores, dim=-1)
     attn_probs = self.dropout(attn_probs)
     
-    # Compute attention output
+    # Compute final attention output
     attn_output = torch.matmul(attn_probs, value)
     
-    # Reshape back to [bs, seq_len, hidden_state]
+    # Reshape back to [batch_size, seq_len, hidden_state]
     attn_output = rearrange(attn_output, 'b h t d -> b t (h d)')
+
+    # DEBUGGING
+    print("Attention scores (before softmax):", scores[0, 0, :, :])
+    print("Attention probabilities:", attn_probs[0, 0, :, :])
+    
     return attn_output
 
 
@@ -66,4 +74,5 @@ class CausalSelfAttention(nn.Module):
     
     # Calculate the multi-head attention.
     attn_value = self.attention(key_layer, query_layer, value_layer, attention_mask)
+
     return attn_value
