@@ -136,3 +136,5 @@ project [Implement BERT](https://web.stanford.edu/class/archive/cs/cs224n/cs224n
 
 Parts of the code are from the [`transformers`](https://github.com/huggingface/transformers)
 library ([Apache License 2.0](./LICENSE)).
+
+Inspiration for this project from *The Mechanical Bard* (https://aclanthology.org/2023.acl-short.140/)
