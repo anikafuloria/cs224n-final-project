@@ -51,8 +51,11 @@ class CausalSelfAttention(nn.Module):
     scores = scores / torch.sqrt(torch.tensor(d_k, dtype=scores.dtype, device=scores.device))
     
     # Apply causal mask
-    scores = scores.masked_fill(attention_mask == 0, 1e-9)
+    causal_mask = torch.triu(torch.ones(scores.shape, dtype=torch.bool), diagonal=1)
+    print('attention_mask:', attention_mask)
+    scores = scores + attention_mask
     
+    scores = scores.masked_fill(causal_mask, float('-inf'))
     # Compute attention probabilities
     print(scores.shape)
     print(attention_mask.shape)
