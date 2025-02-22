@@ -33,19 +33,36 @@ class CausalSelfAttention(nn.Module):
 
   def attention(self, key, query, value, attention_mask):
     ### YOUR CODE HERE
+    """
+    key dims: [bs, num_attention_heads, t, d] (2,12,8,64)
+    query dims: [bs, num_attention_heads, t, d] (2,12,8,64)
+    value dims: [bs, num_attention_heads, t, d] (2,12,8,64)
+    attention_mask dims: [bs, 1, 1, seq_len] (2,1,1,8)
+    """
+    print(key.shape)
+    print(query.shape)
+    print(value.shape)
     d_k = query.shape[-1]
     
     # Compute attention scores
+    # scores dim: [bs, num_attention_heads, t, sqrt(d)]
     scores = torch.matmul(query, key.transpose(-2, -1))
+    print(scores.shape)
     scores = scores / torch.sqrt(torch.tensor(d_k, dtype=scores.dtype, device=scores.device))
     
     # Apply causal mask
-    scores = scores.masked_fill(attention_mask == 0, -1e9)
+    causal_mask = torch.triu(torch.ones(scores.shape, dtype=torch.bool), diagonal=1)
+    print('attention_mask:', attention_mask)
+    scores = scores + attention_mask
     
+    scores = scores.masked_fill(causal_mask, float('-inf'))
     # Compute attention probabilities
+    print(scores.shape)
+    print(attention_mask.shape)
     attn_probs = torch.nn.functional.softmax(scores, dim=-1)
     attn_probs = self.dropout(attn_probs)
-    
+    print(attn_probs.shape)
+
     # Compute final attention output
     attn_output = torch.matmul(attn_probs, value)
     
@@ -55,6 +72,7 @@ class CausalSelfAttention(nn.Module):
     # DEBUGGING
     print("Attention scores (before softmax):", scores[0, 0, :, :])
     print("Attention probabilities:", attn_probs[0, 0, :, :])
+    print("Attention sum:", attn_probs.sum(dim=-1))  # Should be 1 for each sequence position
     
     return attn_output
 
