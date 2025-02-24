@@ -52,8 +52,8 @@ class GPT2Layer(nn.Module):
     ff_output = self.add(attn_output, ff_output, self.out_dense, self.out_dropout)
 
     # DEBUGGING
-    print("Input to LayerNorm:", hidden_states[0, 0, :5])
-    print("After LayerNorm:", attn_input[0, 0, :5])
+    # print("Input to LayerNorm:", hidden_states[0, 0, :5])
+    # print("After LayerNorm:", attn_input[0, 0, :5])
     
     return ff_output
 
