@@ -68,7 +68,7 @@ class GPT2SentimentClassifier(torch.nn.Module):
     ### YOUR CODE HERE
     # Get hidden states from GPT-2
     outputs = self.gpt(input_ids=input_ids, attention_mask=attention_mask)
-    last_hidden_state = outputs.last_hidden_state  # Shape: (batch_size, seq_len, hidden_dim)
+    last_hidden_state = outputs["last_hidden_state"]  # Shape: (batch_size, seq_len, hidden_dim)
 
     # Extract the last token representation
     last_token_hidden = last_hidden_state[:, -1, :]  # Shape: (batch_size, hidden_dim)

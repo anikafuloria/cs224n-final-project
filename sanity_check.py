@@ -25,10 +25,10 @@ def test_gpt2(model_size='gpt2'):
   openai_outputs *= att_mask
 
   # DEBUGGING:
-  openai_embed = openai_model.wte(sent_ids) + openai_model.wpe(torch.arange(sent_ids.shape[1]).unsqueeze(0))
-  our_embed = gpt.word_embedding(sent_ids) + gpt.pos_embedding(gpt.position_ids[:, :sent_ids.shape[1]])
+  # openai_embed = openai_model.wte(sent_ids) + openai_model.wpe(torch.arange(sent_ids.shape[1]).unsqueeze(0))
+  # our_embed = gpt.word_embedding(sent_ids) + gpt.pos_embedding(gpt.position_ids[:, :sent_ids.shape[1]])
 
-  print("Embedding Difference:", torch.abs(openai_embed - our_embed).sum().item())
+  # print("Embedding Difference:", torch.abs(openai_embed - our_embed).sum().item())
 
 
   # DEBUGGING: Compare each layer's hidden state output
